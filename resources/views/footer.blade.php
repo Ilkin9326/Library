@@ -1,0 +1,1 @@
+<div class="d-flex p-2 bd-highlight justify-content-center">&copy;{{date('Y')}}</div>
