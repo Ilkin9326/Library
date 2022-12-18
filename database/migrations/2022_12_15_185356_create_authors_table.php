@@ -19,8 +19,7 @@ return new class extends Migration
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
             $table->increments('author_id');
-            $table->string('name');
-            $table->string('surname');
+            $table->string('fullname');
             $table->string('email')->unique();
             $table->timestamp('create_date')->useCurrent();
         });

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
             $table->increments('publisher_id');
-            $table->string('name')->unique()->comment('Publisher title');
+            $table->string('name')->comment('Publisher title');
             $table->string('api_key')->comment('create UUID for every Publisher');
             $table->timestamp('create_date')->useCurrent();
         });

@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use \App\Http\Controllers\PublisherController;
+use \App\Http\Controllers\ApiController\PublisherController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::group(['prefix' => 'v1'], function(){
-    Route::post('/post_publisher', [PublisherController::class, 'store']);
-    //Route::apiResource('books', PublisherController::class)->only('index', 'show');
+    Route::post('/books', [PublisherController::class, 'storeBookInfo']);
+
+    Route::get('/books', [PublisherController::class, 'getBooksList']);
+    Route::get('/books/{bookId}', [PublisherController::class, 'getBookById']);
+    Route::delete('/books/{bookId}', [PublisherController::class, 'deleteBookById']);
+    Route::put('/books/{bookId}', [PublisherController::class, 'updateBookInfoById']);
 });
 

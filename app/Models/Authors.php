@@ -14,5 +14,5 @@ class Authors extends Model
     public $timestamps = false;
 
     protected  $table = 'authors';
-    protected $fillable = ['name', 'surname', 'email'];
+    protected $fillable = ['fullname', 'email'];
 }

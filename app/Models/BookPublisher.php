@@ -9,5 +9,8 @@ class BookPublisher extends Model
 {
     use HasFactory;
 
-    //protected  $table = 'book_publishers';
+    public $timestamps = false;
+
+    protected $table = 'book_publishers';
+    protected $fillable = ['book_id','publisher_id'];
 }

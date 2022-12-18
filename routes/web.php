@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use \App\Http\Controllers\WebController\HomeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,13 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    $authors = \Illuminate\Support\Facades\DB::table('book_authors as ba')
-        ->join('books as b', 'ba.book_id', '=', 'b.book_id')
-        ->join('authors as a', 'ba.author_id', '=', 'a.author_id')
-        ->join('book_publishers as bpp', 'ba.book_id', '=', 'bpp.book_id')
-        ->join('publisher as p', 'bpp.publisher_id', '=', 'p.publisher_id')
-        ->select('b.title as book_title', 'a.name', 'a.surname', 'p.name as publisher_name')
-        ->get();
-    return view('library', ['name' => 'Samantha', 'data'=>$authors]);
-});
+Route::get('/', [HomeController::class, 'index']);
+
