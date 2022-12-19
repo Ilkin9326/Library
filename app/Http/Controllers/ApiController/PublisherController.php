@@ -10,7 +10,7 @@ use App\Models\BookAuthors;
 use App\Models\BookPublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 class PublisherController extends Controller
 {
     /**
@@ -128,7 +128,7 @@ class PublisherController extends Controller
                 ->select('publisher_id')
                 ->first();
 
-            // Inset book publisher if not already exists
+            // Insert book publisher if not already exists
             if ($bookPublisherInfo == null) {
                 DB::table('book_publishers')->insert(['book_id' => $book_id, 'publisher_id' => $publisherInfo->publisher_id]);
             }

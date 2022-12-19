@@ -21,7 +21,7 @@ return [
     */
     'default_request_headers' => [
         'Accept' => 'application/json',
-        'x-api-key' => 'manual given key',
+        'x-api-key' => 'set api_key from publisher table',
         'Authorization' => 'Bearer',
     ],
 

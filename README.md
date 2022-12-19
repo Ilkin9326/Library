@@ -56,6 +56,7 @@ You can now access the server at http://localhost:8000
 
 ## Documentation
 
+- API authorization has been configurated to manually set a key for every publisher in a publisher table.
 - For API Documentation [laravel-request-docs](https://github.com/rakutentech/laravel-request-docs)
 - For LRD view at http://localhost/request-docs
 
