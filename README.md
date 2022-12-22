@@ -2,7 +2,7 @@
 # Library API system
 - There are several book publishing sites that would like to see their books in the Library. At the same time, different publishers can print the same books. Books can have multiple authors, and authors can have multiple books.
 -  Write a public (without checking the secret token), public RESTful API (hereinafter referred to as the API) for publishing sites, which will allow you to add, modify and delete books from the Library list.
--  Display the list of books on the main page of the Library. Each line of the list should contain the title of the book, the names of the authors, and the name of the publisher. The list should have ajax pagination made from scratch - without using the features of Laravel Eloquent, Bootstrap or any other ready-made solutions.
+-  Display the list of books on the main page of the Library. Each line of the list should contain the title of the book, the names of the authors, and the name of the publisher.The list should have ajax pagination made from scratch - without using the features of Laravel Eloquent, Bootstrap or any other ready-made solutions.
 
 
 
