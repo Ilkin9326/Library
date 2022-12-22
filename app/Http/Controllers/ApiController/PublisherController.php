@@ -13,25 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 class PublisherController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     private function getPublisherInfoByRequestHeader($request)
     {
@@ -250,13 +231,19 @@ class PublisherController extends Controller
      */
     public function deleteBookById(Request $request, $bookId)
     {
-        return response()->json(
-            [
-                'operation_message' => $request->getPathInfo()
-            ], 401);
+
         //Begin Transaction
         DB::beginTransaction();
+
+        if($bookId <= 0 || is_null($bookId)){
+            return response()->json(
+                [
+                    'operation_message' => 'book_id can\'t be null or less than zero '
+                ], 400);
+        }
+
         try {
+
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
 
@@ -319,6 +306,13 @@ class PublisherController extends Controller
     {
         //Begin Transaction
         DB::beginTransaction();
+
+        if($bookId < 0 || is_null($bookId)){
+            return response()->json(
+                [
+                    'operation_message' => 'book_id can\'t be null or less than zero '
+                ], 400);
+        }
         try {
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
@@ -376,15 +370,4 @@ class PublisherController extends Controller
 
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }
