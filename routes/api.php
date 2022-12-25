@@ -19,7 +19,7 @@ use \App\Http\Controllers\ApiController\TestController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::group(['prefix' => 'v1'], function () {
+Route::group(['prefix' => 'v1', 'middleware' => ['verifyApiKey']], function () {
 
     Route::controller(PublisherController::class)->group(function () {
         Route::post('/books', 'storeBookInfo');

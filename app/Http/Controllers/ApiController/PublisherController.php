@@ -50,14 +50,6 @@ class PublisherController extends Controller
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
 
-            // If publisher doesn't exist return corresponding response
-            if ($publisherInfo == null) {
-                return response()->json(
-                    [
-                        'operation_message' => 'Invalid Api key'
-                    ], 401);
-            }
-
             // Handle Authors
             $authors = $request->authors;
 
@@ -148,13 +140,6 @@ class PublisherController extends Controller
     {
         // Get publishers api key from request header
         $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
-        // If publisher doesn't exist return corresponding response
-        if ($publisherInfo == null) {
-            return response()->json(
-                [
-                    'operation_message' => 'Invalid Api key'
-                ], 401);
-        }
 
         $bookListByPublisher = $this->bookOperation->getBooksList($request, $publisherInfo->publisher_id);
         return response()->json(
@@ -182,18 +167,10 @@ class PublisherController extends Controller
      * @bookId book's auto_increment id
      * @lrd:end
      */
-    public function getBookById(Request $request, $bookId)
+    public function getBookById(Request $request, $bookId):JsonResponse
     {
         // Get publishers api key from request header
         $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
-
-        // If publisher doesn't exist return corresponding response
-        if ($publisherInfo == null) {
-            return response()->json(
-                [
-                    'operation_message' => 'Invalid Api key'
-                ], 401);
-        }
 
         //Does book info exist in DB by given parameters(book_id and publisher_id), if not return corresponding response
         $getBookCountByBookId = $this->checkBookExistByBookIdPublisherId($publisherInfo->publisher_id, $bookId);
@@ -246,15 +223,6 @@ class PublisherController extends Controller
 
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
-
-            // If publisher doesn't exist return corresponding response
-            if ($publisherInfo == null) {
-                return response()->json(
-                    [
-                        'operation_message' => 'Invalid Api key'
-                    ], 401);
-            }
-
 
             //Does book info exist in DB by given parameters(book_id and publisher_id), if not return corresponding response
             $getBookCountByBookId = $this->checkBookExistByBookIdPublisherId($publisherInfo->publisher_id, $bookId);
@@ -317,15 +285,6 @@ class PublisherController extends Controller
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
 
-            // If publisher doesn't exist return corresponding response
-            if ($publisherInfo == null) {
-                return response()->json(
-                    [
-                        'operation_message' => 'Invalid Api key'
-                    ], 401);
-            }
-
-
             //Does book info exist in DB by given parameters(book_id and publisher_id), if not return corresponding response
             $getBookCountByBookId = $this->checkBookExistByBookIdPublisherId($publisherInfo->publisher_id, $bookId);
 
@@ -368,11 +327,6 @@ class PublisherController extends Controller
 
 
 
-    }
-
-    public function deleteById($id):JsonResponse
-    {
-        return response()->json($id, 200);
     }
 
 }
