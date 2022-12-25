@@ -8,4 +8,5 @@ use Illuminate\Http\Request;
      public function getBooksList($publisherId);
      public function getBookInfoById($publisher_id,  $bookId);
      public function deleteBookInfoById($publisher_id, $bookId);
+     public function storeBookInfo(Request $request, $publisher_id);
  }

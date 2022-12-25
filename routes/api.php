@@ -32,7 +32,5 @@ Route::group(['prefix' => 'v1', 'middleware' => ['verifyApiKey']], function () {
         Route::put('/books/{bookId}', 'updateBookInfoById');
     });
 
-
-
 });
 

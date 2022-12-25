@@ -42,89 +42,10 @@ class PublisherController extends Controller
         // Validate request
         $request->validated();
 
-        //Begin Transaction
-        DB::beginTransaction();
-        try {
-            // Get publishers api key from request header
-            $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
+        // Get publishers api key from request header
+        $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
+        return $this->bookOperation->storeBookInfo($request, $publisherInfo->publisher_id);
 
-            // Handle Authors
-            $authors = $request->authors;
-
-            for ($i = 0; $i < count($authors); $i++) {
-                $authorInfo = DB::table('authors')->where(
-                    [
-                        ['fullname', '=', $authors[$i]['fullname']],
-                        ['email', '=', $authors[$i]['email']
-                        ]
-                    ])->first();
-
-                $authorId = 0;
-
-                if ($authorInfo != null) {
-                    $authorId = $authorInfo->author_id;
-                } else {
-                    //Insert new author record and get Id
-                    $authorId = DB::table('authors')->insertGetId(
-                        [
-                            'fullname' => $authors[$i]['fullname'],
-                            'email' => $authors[$i]['email']
-                        ]
-                    );
-
-                }
-
-                // Set author id
-                $authors[$i]['author_id'] = $authorId;
-            }
-
-
-            // Check if a book already exists in database with same title and authors
-            $authorsInCondition = implode(",", array_column($authors, 'author_id'));
-            $strSQL = "select b.book_id from books as b
-                    where b.title=?
-                    and (select count(*) from book_authors ba where ba.book_id=b.book_id)=?
-                    and (select count(*) from book_authors ba where ba.book_id=b.book_id and ba.author_id not in (" . $authorsInCondition . "))=0";
-
-
-            $bookInfo = DB::select($strSQL, [$request->book_title, count($authors)]);
-
-            $book_id = 0;
-            if ($bookInfo != null) {
-                $book_id = $bookInfo[0]->book_id;
-            } else {
-                // Insert new book
-                $book_id = DB::table('books')->insertGetId(['title' => $request->book_title]);
-
-                // Insert book authors
-                foreach ($authors as $author) {
-                    BookAuthors::create(['book_id' => $book_id, 'author_id' => $author['author_id']]);
-                }
-            }
-
-            // If this book is not exists already in given publisher
-            $bookPublisherInfo = DB::table('book_publishers')->where([['book_id', '=', $book_id], ['publisher_id', '=', $publisherInfo->publisher_id]])
-                ->select('publisher_id')
-                ->first();
-
-            // Insert book publisher if not already exists
-            if ($bookPublisherInfo == null) {
-                DB::table('book_publishers')->insert(['book_id' => $book_id, 'publisher_id' => $publisherInfo->publisher_id]);
-            }
-
-            DB::commit();
-            return response()->json(
-                [
-                    'operation_message' => 'Your record was successfully created'
-                ], 200);
-
-        }catch (\Exception $exception){
-            DB::rollBack();
-            return response()->json(
-                [
-                    'operation_message' =>  $exception->getMessage()
-                ], 500);
-        }
     }
 
 
