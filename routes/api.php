@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\ApiController\PublisherController;
+use \App\Http\Controllers\ApiController\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +19,19 @@ use \App\Http\Controllers\ApiController\PublisherController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::group(['prefix' => 'v1'], function(){
-    Route::post('/books', [PublisherController::class, 'storeBookInfo']);
+Route::group(['prefix' => 'v1'], function () {
 
-    Route::get('/books', [PublisherController::class, 'getBooksList']);
-    Route::get('/books/{bookId}', [PublisherController::class, 'getBookById']);
-    Route::delete('/books/{bookId}', [PublisherController::class, 'deleteBookById']);
-    Route::put('/books/{bookId}', [PublisherController::class, 'updateBookInfoById']);
+    Route::controller(PublisherController::class)->group(function () {
+        Route::post('/books', 'storeBookInfo');
+
+        Route::get('/books', 'getBooksList');
+        Route::get('/books/{bookId}', 'getBookById');
+        Route::delete('/books/{bookId}', 'deleteBookById')->where('bookId', '[0-9]+');
+        Route::put('/books/{bookId}', 'updateBookInfoById');
+        Route::delete('/delete/{id}', 'deleteById')->where('id', '[0-9]+')->middleware('ValidateSignature');
+    });
+
+
+
 });
 

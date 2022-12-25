@@ -13,5 +13,7 @@ use \App\Http\Controllers\WebController\HomeController;
 |
 */
 
+
+
 Route::get('/', [HomeController::class, 'showBooksList']);
 Route::get('/pagination/page/{id}', [HomeController::class, 'fetch_data']);

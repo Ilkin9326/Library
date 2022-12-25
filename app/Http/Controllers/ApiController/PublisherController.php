@@ -8,11 +8,19 @@ use App\Models\Authors;
 use App\Models\Book;
 use App\Models\BookAuthors;
 use App\Models\BookPublisher;
+use App\Repository\IBookRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 class PublisherController extends Controller
 {
+    private $bookOperation;
+
+    public function __construct(IBookRepository $bookRepository)
+    {
+        $this->bookOperation = $bookRepository;
+    }
 
     private function getPublisherInfoByRequestHeader($request)
     {
@@ -136,11 +144,10 @@ class PublisherController extends Controller
      * ## This api gets all the book list by Publisher
      * @lrd:end
      */
-    public function getBooksList(Request $request)
+    public function getBooksList(Request $request):JsonResponse
     {
         // Get publishers api key from request header
         $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
-
         // If publisher doesn't exist return corresponding response
         if ($publisherInfo == null) {
             return response()->json(
@@ -148,21 +155,14 @@ class PublisherController extends Controller
                     'operation_message' => 'Invalid Api key'
                 ], 401);
         }
-        $strSql = "SELECT bp.book_id, b.title, GROUP_CONCAT(a.fullname SEPARATOR ', ') as authors_fullname, GROUP_CONCAT(a.email SEPARATOR ', ') as authors_email FROM book_publishers as bp
-                        join books as b on b.book_id=bp.book_id
-                        join book_authors as ba on ba.book_id = b.book_id
-                        join authors as a on a.author_id=ba.author_id
-                        WHERE bp.publisher_id=?
-                        group by  ba.book_id";
 
-
-        $bookListByPublisher = DB::select($strSql, [$publisherInfo->publisher_id]);
-
+        $bookListByPublisher = $this->bookOperation->getBooksList($request, $publisherInfo->publisher_id);
         return response()->json(
             [
                 'operation_message' => "Success response ",
                 'book_list' => $bookListByPublisher
             ], 200);
+
 
     }
 
@@ -235,14 +235,14 @@ class PublisherController extends Controller
         //Begin Transaction
         DB::beginTransaction();
 
-        if($bookId <= 0 || is_null($bookId)){
-            return response()->json(
-                [
-                    'operation_message' => 'book_id can\'t be null or less than zero '
-                ], 400);
-        }
-
         try {
+
+            if($bookId <= 0 || is_null($bookId)){
+                return response()->json(
+                    [
+                        'operation_message' => 'book_id can\'t be null or less than zero '
+                    ], 400);
+            }
 
             // Get publishers api key from request header
             $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
@@ -368,6 +368,11 @@ class PublisherController extends Controller
 
 
 
+    }
+
+    public function deleteById($id):JsonResponse
+    {
+        return response()->json($id, 200);
     }
 
 }
