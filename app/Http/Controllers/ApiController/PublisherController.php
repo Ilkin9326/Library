@@ -4,15 +4,13 @@ namespace App\Http\Controllers\ApiController;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePublisherPostRequest;
-use App\Models\Authors;
-use App\Models\Book;
 use App\Models\BookAuthors;
-use App\Models\BookPublisher;
 use App\Repository\IBookRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+
 class PublisherController extends Controller
 {
     private $bookOperation;
@@ -141,7 +139,7 @@ class PublisherController extends Controller
         // Get publishers api key from request header
         $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
 
-        $bookListByPublisher = $this->bookOperation->getBooksList($request, $publisherInfo->publisher_id);
+        $bookListByPublisher = $this->bookOperation->getBooksList($publisherInfo->publisher_id);
         return response()->json(
             [
                 'operation_message' => "Success response ",
@@ -151,15 +149,6 @@ class PublisherController extends Controller
 
     }
 
-
-    private function checkBookExistByBookIdPublisherId($publisherID, $bookId)
-    {
-        if ($publisherID > 0 && $bookId > 0) {
-            return DB::table('book_publishers as bp')
-                ->whereRaw('bp.publisher_id = :bp_id and bp.book_id = :bid', ['bp_id' => $publisherID, 'bid' => $bookId])
-                ->count();
-        }
-    }
 
     /**
      * @lrd:start
@@ -172,26 +161,9 @@ class PublisherController extends Controller
         // Get publishers api key from request header
         $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
 
-        //Does book info exist in DB by given parameters(book_id and publisher_id), if not return corresponding response
-        $getBookCountByBookId = $this->checkBookExistByBookIdPublisherId($publisherInfo->publisher_id, $bookId);
+        $bookInfoById = $this->bookOperation->getBookInfoById($publisherInfo->publisher_id, $bookId);
 
-        if ($getBookCountByBookId <= 0) {
-            return response()->json(
-                [
-                    'operation_message' => "No data found"
-                ], 400);
-        }
-
-        $strSql = "SELECT bp.book_id, b.title, GROUP_CONCAT(a.fullname SEPARATOR ', ') as authors_fullname, GROUP_CONCAT(a.email SEPARATOR ', ') as authors_email FROM book_publishers as bp
-                        join books as b on b.book_id=bp.book_id
-                        join book_authors as ba on ba.book_id = b.book_id
-                        join authors as a on a.author_id=ba.author_id
-                        WHERE bp.publisher_id=? and bp.book_id=?
-                        group by  ba.book_id";
-
-
-        $bookInfoById = DB::select($strSql, [$publisherInfo->publisher_id, $bookId]);
-
+        //Log::channel('book')->warning($bookInfoById);
         return response()->json(
             [
                 'operation_message' => "Success response",
@@ -208,59 +180,9 @@ class PublisherController extends Controller
      */
     public function deleteBookById(Request $request, $bookId)
     {
-
-        //Begin Transaction
-        DB::beginTransaction();
-
-        try {
-
-            if($bookId <= 0 || is_null($bookId)){
-                return response()->json(
-                    [
-                        'operation_message' => 'book_id can\'t be null or less than zero '
-                    ], 400);
-            }
-
-            // Get publishers api key from request header
-            $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
-
-            //Does book info exist in DB by given parameters(book_id and publisher_id), if not return corresponding response
-            $getBookCountByBookId = $this->checkBookExistByBookIdPublisherId($publisherInfo->publisher_id, $bookId);
-            if ($getBookCountByBookId <= 0) {
-                return response()->json(
-                    [
-                        'operation_message' => "No data found to delete"
-                    ], 400);
-            }
-
-            //delete book_id and publisher from book_publishers table
-            DB::table('book_publishers as bp')
-                ->whereRaw('bp.publisher_id = :bp_id and bp.book_id = :bid', ['bp_id' => $publisherInfo->publisher_id, 'bid' => $bookId])
-                ->delete();
-
-            //Also delete book's author
-            DB::table('book_authors as ba')
-                ->whereRaw('ba.book_id = :bid', ['bid' => $bookId])
-                ->delete();
-
-            //Also delete Book
-            DB::table('books as b')
-                ->whereRaw('b.book_id = :bid', ['bid' => $bookId])
-                ->delete();
-
-            DB::commit();
-            return response()->json(
-                [
-                    'operation_message' => "The book number ".$bookId." was successfully deleted"
-                ], 200);
-
-        }catch (\Exception $exception){
-            DB::rollBack();
-            return response()->json(
-                [
-                    'operation_message' =>  $exception->getMessage()
-                ], 500);
-        }
+        // Get publishers api key from request header
+        $publisherInfo = $this->getPublisherInfoByRequestHeader($request);
+        return $this->bookOperation->deleteBookInfoById($publisherInfo->publisher_id, $bookId);
 
     }
 

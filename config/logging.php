@@ -63,6 +63,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
         ],
 
+        'book'=>[
+            'driver' => 'single',
+            'path' => storage_path('logs/book_crud.log'),
+            'level' => env('LOG_LEVEL', 'alert'),
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),

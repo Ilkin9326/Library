@@ -19,6 +19,8 @@ use \App\Http\Controllers\ApiController\TestController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
 Route::group(['prefix' => 'v1', 'middleware' => ['verifyApiKey']], function () {
 
     Route::controller(PublisherController::class)->group(function () {
@@ -28,7 +30,6 @@ Route::group(['prefix' => 'v1', 'middleware' => ['verifyApiKey']], function () {
         Route::get('/books/{bookId}', 'getBookById');
         Route::delete('/books/{bookId}', 'deleteBookById')->where('bookId', '[0-9]+');
         Route::put('/books/{bookId}', 'updateBookInfoById');
-        Route::delete('/delete/{id}', 'deleteById')->where('id', '[0-9]+')->middleware('ValidateSignature');
     });
 
 
